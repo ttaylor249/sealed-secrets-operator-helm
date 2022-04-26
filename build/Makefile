@@ -1,12 +1,15 @@
-VERSION = 0.0.2
+VERSION = 0.0.4
 NAME = sealed-secrets-operator-helm
 
-RELEASE_IMAGE_0_0_2=quay.io\/disposab1e\/sealed-secrets-operator-helm@sha256:d07a66107243a0054a54aac7cd71c0a8a342c4cd45c6609ec2ab6470df16f09c
+#RELEASE_IMAGE_0_0_2=quay.io\/disposab1e\/sealed-secrets-operator-helm@sha256:d07a66107243a0054a54aac7cd71c0a8a342c4cd45c6609ec2ab6470df16f09c
+RELEASE_IMAGE_0_0_3=quay.io\/hap\/sealed-secrets-operator-helm@sha256:
 
 REGISTRY_REL = quay.io
-REGISTRY_DEV = imac.fritz.box:5000
+#REGISTRY_DEV = imac.fritz.box:5000
 REGISTRY_CI = docker.io
-NAMESPACE=disposab1e
+#NAMESPACE=disposab1e
+REGISTRY_DEV = quay.io
+NAMESPACE=hap
 
 BUNDLE_MANIFEST_BASE_DIR = ../deploy/olm-catalog/
 BUNDLE_DIR = bundle
@@ -179,7 +182,7 @@ guide-generate-ocp3-olm-ci:
 
 operator-build-dev:
 	export GO111MODULE=on
-	cd ../ && operator-sdk build ${REGISTRY_DEV}/${NAMESPACE}/${NAME}:v${VERSION}
+	cd ../ && operator-sdk-v0.19.4 build --verbose ${REGISTRY_DEV}/${NAMESPACE}/${NAME}:v${VERSION}
 	
 operator-push-dev:
 	docker push ${REGISTRY_DEV}/${NAMESPACE}/${NAME}:v${VERSION}
@@ -215,13 +218,14 @@ bundle-generate-ocp-dev:
 	cp -r ${BUNDLE_MANIFEST_BASE_DIR}/ocp/${NAME} ${BUNDLE_BUILD_BASE_DIR}/dev/ocp/manifests/
 
 bundle-verify-ocp-dev:
-	operator-courier --verbose verify --ui_validate_io ${BUNDLE_BUILD_BASE_DIR}/dev/ocp/manifests/${NAME}
+#	operator-courier --verbose verify --ui_validate_io ${BUNDLE_BUILD_BASE_DIR}/dev/ocp/manifests/${NAME}
+	operator-sdk bundle validate ${BUNDLE_BUILD_BASE_DIR}/dev/ocp/manifests/${NAME}/${VERSION}
 
 bundle-build-ocp-dev: 
-	docker build -t ${REGISTRY_DEV}/${NAMESPACE}/${NAME}-registry-ocp:${VERSION} ${BUNDLE_BUILD_BASE_DIR}/dev/ocp/
+	docker build -t ${REGISTRY_DEV}/${NAMESPACE}/${NAME}-bundle-ocp:v${VERSION} ${BUNDLE_BUILD_BASE_DIR}/dev/ocp/
 
 bundle-push-ocp-dev:
-	docker push ${REGISTRY_DEV}/${NAMESPACE}/${NAME}-registry-ocp:${VERSION}
+	docker push ${REGISTRY_DEV}/${NAMESPACE}/${NAME}-bundle-ocp:v${VERSION}
 
 
 ########################################################

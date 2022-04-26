@@ -1,13 +1,21 @@
-# upstream-registry-builder v1.12.4
-FROM quay.io/operator-framework/upstream-registry-builder@sha256:8d392ab0587d5bcd19a40d60ac6bc8214e6b515605be3113edd01ea99ce95942 as builder
-
-COPY manifests manifests
-RUN ./bin/initializer -o ./bundles.db
-
 FROM scratch
-COPY --from=builder /build/bundles.db /bundles.db
-COPY --from=builder /build/bin/registry-server /registry-server
-COPY --from=builder /bin/grpc_health_probe /bin/grpc_health_probe
-EXPOSE 50051
-ENTRYPOINT ["/registry-server"]
-CMD ["--database", "bundles.db"]
+
+# Core bundle labels.
+LABEL operators.operatorframework.io.bundle.mediatype.v1=registry+v1
+LABEL operators.operatorframework.io.bundle.manifests.v1=manifests/
+LABEL operators.operatorframework.io.bundle.metadata.v1=metadata/
+LABEL operators.operatorframework.io.bundle.package.v1=hap-dataset-operator
+LABEL operators.operatorframework.io.bundle.channels.v1=stable,beta
+LABEL operators.operatorframework.io.bundle.channel.default.v1=stable
+LABEL operators.operatorframework.io.metrics.builder=operator-sdk-v1.9.0+git
+LABEL operators.operatorframework.io.metrics.mediatype.v1=metrics+v1
+LABEL operators.operatorframework.io.metrics.project_layout=go.kubebuilder.io/v3
+
+# Labels for testing.
+LABEL operators.operatorframework.io.test.mediatype.v1=scorecard+v1
+LABEL operators.operatorframework.io.test.config.v1=tests/scorecard/
+
+# Copy files to locations specified by labels.
+COPY manifests/sealed-secrets-operator-helm/0.0.4/manifests /manifests/
+COPY manifests/sealed-secrets-operator-helm/0.0.4/metadata /metadata/
+COPY manifests/sealed-secrets-operator-helm/0.0.4/tests/scorecard /tests/scorecard/

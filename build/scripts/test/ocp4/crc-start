@@ -4,14 +4,14 @@ set -e
 echo "======================================================"
 echo "Setup crc ${CRC_VERSION} environment"
 echo "======================================================"
+echo "Disabled.  Using preexisting CRC setup"
+#crc cleanup --force
 
-crc cleanup --force
+#crc setup
 
-crc setup
-
-crc config set cpus 4
-crc config set memory ${MEMORY}
-crc config set pull-secret-file ${HOME}/redhat/crc/pull-secret
+#crc config set cpus 4
+#crc config set memory ${MEMORY}
+#crc config set pull-secret-file ${HOME}/redhat/crc/pull-secret
 
 echo "======================================================"
 echo "Starting crc ${CRC_VERSION}"
